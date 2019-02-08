@@ -1,0 +1,35 @@
+\section{Theory}
+\label{sec:theory}
+
+In this chapter we will outline the theoretical background, relevant for our paper.
+There are numerous career success theories and models, but no one is sufficient to describe the broad field of career development. Therefore, there are different career success indicators for different jobs. It can also be divided in two different components. For example external or extrinsic components e.g. employee´s salary level, total compensation, promotions and the internal or intrinsic components e.g career and life satisfaction levels. Researchers have agreed that in order to investigate career success, both dimensions of career success should be studied together.
+
+There exists extensive literature on this topic, such as \cite{Ishak2015}, \cite{beruflicheerwartungen}. In the following paragraphs we summarize our findings during literature review, define a few terms that are frequently used throughout the paper and introduce some of the core theories and key ideas about career and financial capital theories.
+
+\paragraph{Career Aspiration:}
+\textit{"A students‘ ability to identify and set career goals for the future, while being inspired in the present to work toward those goals“} \cite{Ishak2015}
+
+\paragraph{Theory of process}
+Theory of process related to interaction and change over time. This can be characterised by theories in which there are a sere of stages through which people pass.
+
+\paragraph{Theory of content}
+Theories of content related to the characteristic of individual and the context they live in. The influences on career development are thought to be either intrinsic to the individual or originate from the context in which the individual lives.
+
+
+\paragraph{Financial Capital}
+In theory family and social capital can emerge as an important resource in raising educational aspirations, thereby upholding students beliefs in their ability to realize their aspiration, and eventually, reach their goals \cite{schneiderstevenson}.
+
+After completing their studies many graduates particularly value three areas:
+
+\begin{enumerate}
+\item personal and social aspects
+
+good working atmosphere, agreement with personal convictions,ideas
+\item aspects related to qualification
+\item secure job
+
+Other important criteria to be mentioned, although on a smaller scale
+\item compatibility of work and private life 
+\item geographical proximity
+\item income
+\end{enumerate}

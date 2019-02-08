@@ -1,0 +1,939 @@
+\section{Empirical Evaluation}
+\label{sec:empirical}
+
+\subsection{Descriptive Statistics}
+\label{sec:descstats}
+
+\subsubsection{Representativeness}
+
+Before we delve into statistics about our sample, it seems prudent to investigate whether our sample is really representative. Keep in mind that we use a sample size of $N=98$ for all our statistics, as we had to discard two observations. In order to see how our sample represents the ground truth, we compare it with the census conducted by the Austrian Statistical Office "Statistik Austria" \cite{StatistikAustria} in 2018.
+
+<<echo=FALSE>>=
+library(psych)
+options(warn=-1)
+source('survey_696322_R_syntax_file.R')
+source('util.R')
+data <- clean.data(data)
+@
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q014, main = "Distribution of gender in our sample")
+    @
+  %\caption{A figure}
+  \label{fig:freq_gender_sample}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    barplot(c(147526, 130526), names.arg = levels(data$Q014), main = "Distribution of gender in the population")
+    @
+  %\caption{Another figure}
+  \label{fig:freq_gender_truth}
+\end{minipage}
+\caption{Distribution of gender in our sample and in the population}
+\label{fig:freq_gender}
+\end{figure}
+
+In \autoref{fig:freq_gender}, we see that 37 of respondents in our sample were female, while 61 were male. This seems significantly different from the ground truth. Of all 278,052 students of public universities, 147,526 were female and 130,526 were male. To find out whether these observations are significantly different from each other, we use a $\chi^2$ test with the following hypotheses using a significance level of $\alpha=0.05$:
+
+\begin{itemize}
+    \item $H_0$: \texttt{Gender} distribution in our sample is homogeneous to the \texttt{Gender} distribution in the population.
+    \item $H_A$: \texttt{Gender} distribution in our sample is not homogeneous to the \texttt{Gender} distribution in the population.
+\end{itemize}
+
+<<echo=FALSE, warnings=FALSE>>=
+chisq.test(matrix(c(summary(data$Q014), c(147526, 130526)), ncol = 2))
+@
+
+As can be seen in the above R output, the p-value is lower than $\alpha$. Therefore, we reject $H_0$ and accept $H_A$. There is a significant difference in the \texttt{Gender} distribution of our samples and the \texttt{Gender} distribution in the population.
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q016, main = "Distribution of academic degrees in our sample")
+    @
+  %\caption{A figure}
+  \label{fig:freq_degree_sample}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    barplot(c(47282, 32383, 7442), names.arg = levels(data$Q016), main = "Distribution of academic degrees in the population")
+    @
+  %\caption{Another figure}
+  \label{fig:freq_degree_truth}
+\end{minipage}
+\caption{Distribution of academic degrees in our sample and in the population}
+\label{fig:freq_degrees}
+\end{figure}
+
+In \autoref{fig:freq_degrees}, we see that 82 of our respondents pursued an undergraduate degree (Bachelor), while 16 pursued a graduate degree (Master and Master equivalents such as Magister, Dipl.-Ing. or Dr. med.). None of the respondents pursued a doctorate. In reality, 47,282 students pursued a undergraduate degree, 32,383 pursued a graduate degree and 7,442 pursued a doctorate.
+
+Again, we use a $\chi^2$ test to find out whether the observed frequencies are similar to the frequencies in the ground truth. Our hypotheses using a significance level of $\alpha=0.05$ are:
+
+\begin{itemize}
+    \item $H_0$: \texttt{Degree} distribution in our sample is homogeneous to the \texttt{Degree} distribution in the population.
+    \item $H_A$: \texttt{Degree} distribution in our sample is not homogeneous to the \texttt{Degree} distribution in the population.
+\end{itemize}
+
+<<echo=FALSE, warnings=FALSE>>=
+chisq.test(matrix(c(summary(data$Q016), c(47282, 32383, 7442)), ncol = 2))
+@
+
+The p-value in the above R output is lower than $\alpha$. Therefore, we reject $H_0$ and accept $H_A$. There is a significant difference in the \texttt{Degree} distribution of our samples and the \texttt{Degree} distribution in the population.
+
+As we can see, our sample does not represent the population distribution for both the \texttt{Gender} and \texttt{Degree} variables. As these are the only recorded demographic variables that are comparable to the census, we can use only those variables to ascertain the representativeness of our sample. In light of the above findings, it seems clear that our sample is \emph{not} representative. For lack of better data, we will continue our investigations nonetheless. Furthermore, we decide against using stratification to achieve representative subsamples, as we have too little data as to afford to leave observations unused.
+
+Interestingly, if we compare our sample with the census data for Wirtschaftsuniversität Wien \cite{wustat} and Technische Universität Wien \cite{tustat} only, where without doubt most of our respondents study, the picture is different. Of 22,113 students studying at Wirtschaftsuniversität Wien, 10,522 were female and 11,591 were male. Among the 27,709 students studying at Technische Universität Wien, 7,839 were female and 19,870 were male. We see in \autoref{fig:freq_gender_wutu} that the gender distribution is nearly identical with the distribution in the subpopulation.
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q014, main = "Distribution of gender in our sample")
+    @
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    female.wutu <- 7839 + 10522
+    male.wutu <- 19870 + 11591
+    barplot(c(female.wutu, male.wutu), names.arg = levels(data$Q014), main = "Distribution of gender in the population of WU and TU Wien")
+    @
+\end{minipage}
+\caption{Distribution of gender in our sample and in the population of WU and TU Wien}
+\label{fig:freq_gender_wutu}
+\end{figure}
+
+In order to see if this holds, we use a $\chi^2$ test with the following hypotheses using a significance level of $\alpha=0.05$:
+
+\begin{itemize}
+    \item $H_0$: \texttt{Gender} distribution in our sample is homogeneous to the \texttt{Gender} distribution in the subpopulation.
+    \item $H_A$: \texttt{Gender} distribution in our sample is not homogeneous to the \texttt{Gender} distribution in the subpopulation.
+\end{itemize}
+
+<<echo=FALSE, warnings=FALSE>>=
+chisq.test(matrix(c(summary(data$Q014), c(female.wutu, male.wutu)), ncol = 2))
+@
+
+We see that the $\chi^2$ is very small and the p-value is very high. Therefore, we do \emph{not} need to reject $H_0$. 
+
+Now, we want to see if this is true for the \textttt{Degree} variable as well. In the winter semester of 2018, there were 21,362 undergraduate students, 8,040 graduate students and 2,232 doctorate students studying at Wirtschaftsuniversität Wien or Technische Universität Wien. We see in \autoref{fig:freq_degrees_wutu} that the distribution is still a bit different.
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q016, main = "Distribution of academic degrees in our sample")
+    @
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    bachelor.wutu <- 1936 + 19426
+    master.wutu <- 1009 + 7031
+    phd.wutu <- 87 + 2232
+    barplot(c(bachelor.wutu, master.wutu, phd.wutu), names.arg = levels(data$Q016), main = "Distribution of academic degrees in the population of WU and TU Wien")
+    @
+\end{minipage}
+\caption{Distribution of academic degrees in our sample and in the population of WU and TU Wien}
+\label{fig:freq_degrees_wutu}
+\end{figure}
+
+To investigate this, we use a $\chi^2$ test with the following hypotheses using a significance level of $\alpha=0.05$:
+
+\begin{itemize}
+    \item $H_0$: \texttt{Degree} distribution in our sample is homogeneous to the \texttt{Degree} distribution in the subpopulation.
+    \item $H_A$: \texttt{Degree} distribution in our sample is not homogeneous to the \texttt{Degree} distribution in the subpopulation.
+\end{itemize}
+
+<<echo=FALSE, warnings=FALSE>>=
+chisq.test(matrix(c(summary(data$Q016), c(bachelor.wutu, master.wutu, phd.wutu)), ncol = 2))
+@
+
+The p-value is smaller than our significance level, so we have to reject $H_0$ and accept $H_A$. There is a significant difference in the \textttt{Degree} distribution of our sample in the \textttt{Degree} distribution of the subpopulation.
+
+The above investigation shows that our sample is biased. As an overwhelming amount of respondents pursued an undergraduate degree, we can at most assume that our sample represents only a specific subset of students - namely undegraduate students studying at Wirtschaftsuniversität Wien or Technische Universität Wien.
+
+<<echo=FALSE>>=
+levels(data$Q016)[3] <- levels(data$Q016)[2]
+@
+
+\subsubsection{Aspiration for career success}
+
+Now, we will delve into the data set and investigate our most important variable: The aspiration for career. This variable is used as dependent variable in all of our hypotheses.
+
+We measured this latent variable using the following five Likert items with five levels each:
+
+\begin{itemize}
+\item Technical training
+\item Opportunity to continue prior education
+\item Income
+\item Reputation of the company
+\item Advancement opportunities
+\end{itemize}
+
+\autoref{fig:dist_career_items} shows the distribution for each Likert item. 
+
+\begin{figure}[p]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q001_SQ001, main = "Distribution of technical training")
+    @
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q001_SQ002, main = "Distribution of opportunity to continue prior education")
+    @
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q001_SQ003, main = "Distribution of income")
+    @
+  %\caption{Another figure}
+  %\label{fig:freq_degree_truth}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q001_SQ004, main = "Distribution of reputation of the company")
+    @
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+  <<echo=FALSE, fig=TRUE>>=
+    plot(data$Q001_SQ005, main = "Distribution of advancement opportunities")
+    @
+\end{minipage}
+\caption{Distributions of aspiration for career success Likert items}
+\label{fig:dist_career_items}
+\end{figure}
+
+We want to combine these five items into a single variable to be used in our calculations. Before we do that, we need to ensure that these items are really measuring the same things, i.e. we need to ensure their reliability. We see in \autoref{fig:dist_career_items} that the items have different distributions, especially the `reputation of the company` item. To investigate the reliability of these items we make use of Cronbach's alpha.
+
+<<echo=FALSE>>=
+career.data <- read.csv('survey_696322_R_data_file.csv')
+career.data <- clean.data(career.data)
+career.data <- career.data[,2:6]
+career.names <- c('Fachliche Weiterentwicklung', 'Eine Stelle im Fachgebiet', 'income', 'Ansehen des Unternehmens', 'Aufstiegsmöglichkeiten')
+career.data <- factors.as.numeric(career.data)
+summary(alpha(career.data))
+@
+
+We see in the above R output that Cronbach's alpha is 0.51. This value is relatively low and shows that our items do not measure the same latent variable. This means that the reliability of our measurement is not good. A Cronbach's alpha greater than 0.6 would be preferable.
+
+It seems as though our scale does not measure what we want it to measure.
+It could be the case that there are acutally more latent variables underlying our items.
+To investigate this, we will employ a Principal component analysis (PCA).
+A PCA attempts to construct components (or factors) as linear combination of items s.t. they are orthogonal to each other and capture the variance of the sample.
+
+Before we begin our PCA, we need to investigate the suitability of our data to a PCA. A common measure for this is the Kaiser-Meyer-Olkin Measure of Sampling Adequacy (KMO, or MSA).
+
+<<echo=FALSE>>=
+KMO(career.data)
+@
+
+As we can see in the above R output, our data yields a KMO value of 0.49, which is  - in the words of Kaiser - unacceptable. In general, the value should be greater than 0.7. We understand that our data is not suited to a PCA. We still decide to compute the PCA in order to find out whether we can use the data in a different, more adequate way.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+career.pca.result <- principal(career.data, nfactors = 2, scores = TRUE)
+plot(career.pca.result$value, type = 'b', main = 'Screeplot')
+@
+\caption{Screeplot of aspiration for career}
+\label{fig:scree_career}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+plot(career.pca.result, xlab = "Career development", ylab = "Career success")
+@
+\caption{Item loadings on career factors}
+\label{fig:loadings_career}
+\end{minipage}
+\end{figure}
+
+The result of our PCA using the varimax rotation method is visualized using a scree plot in \autoref{fig:scree_career}. This plot indicates
+the captured variance for each of the constructed factors.
+As a visual intuition, all factors prior to the "ellbow" in the plot are eligible factors.
+Our plot shows an elbow at the third factor, therefore we need two factors to explain the variance in our data.
+
+As a general rule of thumb, all factors with an eigenvalue greater than one are capture significant variance.
+
+<<echo=FALSE>>=
+career.pca.result$values
+@
+
+The above list shows the eigenvalues for all computed factors. We see that the first two factors have an eigenvalue greater than one. We see that this rule, too, leads us to using the first two factors.
+
+
+As each factor $f$ is a linear combination of our original items $f=\sum_{i=0}^N \alpha_i l_i$
+(where $l_i$ is the $i$th item), the loading $\alpha_i$ shows the importance of the item $l_i$.
+
+\autoref{fig:loadings_career} uses this information to show the item loadings on the first two factors. We see that the items 1 (technical training), 2 (opportunity to continue prior education) and 4 (reputation of the company) load highly, i.e. greater than 0.4 onto the first factor. On the other hand items 3 (income) and 5 (advancement opportunities) load highly onto the second factor. This is an interesting result, as it shows us that there is a clear distinction between those two groups of items. In light of this, we denote the first factor as `aspiration for career development` and the second factor as `aspiration for career success`.
+
+We now calculate the reliability for both item groups individually to investigate whether we can use them for our hypotheses.
+
+<<echo=FALSE>>=
+development <- career.data[c(1,2,4)]
+summary(alpha(development))
+@
+
+<<echo=FALSE>>=
+success <- career.data[c(3,5)]
+summary(alpha(success))
+@
+
+We see in the above R outputs that Cronbach`s alpha using the career development items is 0.55, which is still not good. On the other hand, Cronbach`s alpha using the career success items is 0.66, which is barely acceptable. This leads us to the conclusion: The career success factor is more reliable than the career development factor. Therefore, we decide to discard the factor `aspiration for career development` and use only `aspiration for career success` for future calculations.
+
+What this means for our research is that we do not measure the overall aspiration for career of students anymore, but only the aspiration of career success. In other words, we decide to only focus on the "hard" indicators income and position and discard the "soft" ones.
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+success.pca.result <- principal(success, nfactors = 1, scores = TRUE)
+success.scores <- success.pca.result$scores[,'PC1']
+data['erfolg'] <- success.scores
+boxplot(success.scores, horizontal = T, xlab = 'Factor score', main = 'Factor scores for aspiration for career success')
+@
+\caption{Factor scores for aspiration for career success}
+\label{fig:scores_success}
+\end{figure}
+
+We use the results of our investigations to fulfill our original goal: to create a single dependent variable. Our dependent variable is the \textttt{aspiration for career success} factor, which is a a linear combination of the interval-scaled income and advancement opportunities variables and therefore a metric variable. Lower values indicate a lower aspiration for career success. The distribution of this variable can be seen in \autoref{fig:scores_success}. As we can clearly see, the \textttt{aspiration for career success} variable is right skewed and has outliers, therefore it is not approximately normally distributed. For summary statistics, refer to the below table.
+
+<<echo=FALSE>>=
+summary(success.scores)
+@
+
+\subsection{Inferential Statistics}
+
+In this section, we will finally test whether our hypotheses as defined in \autoref{subsec:hypothesis} hold true. Keep in mind that we refined our sole dependent variable from \textttt{aspiration for career} to \textttt{aspiration for career success}. Further note that we use a sample size of $N=98$ and a significance level of $\alpha=0.05$ where not further specified.
+
+\subsubsection{Hypothesis 1}
+
+Our first hypothesis is: The more a student has worked during his/her studies, the higher is the student's aspiration for career success.
+
+We measured the amount of work using two variables:
+\begin{itemize}
+    \item Amount of working semesters
+    \item Amount of internships
+\end{itemize}
+
+As explained in \autoref{subsec:hypothesis}, we define the amount of working semesters as the amount of semesters in which a student worked for longer than 10 hours a week. For the amount of internships, we both considers paid and unpaid internships. The distributions for both variables can be seen in \autoref{fig:dist_working_semesters} and \autoref{fig:dist_internships}.
+
+\begin{figure}[h]
+\begin{minipage}{0.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+hist(data$Q002, breaks=20, main = "Distribution of amount of working semesters", xlab = "Amount of working semesters")
+@
+\caption{Distribution of \textttt{amount of working semesters}}
+\label{fig:dist_working_semesters}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+hist(data$Q003, main = "Distribution of amount of internships", xlab = "Amount of internships")
+@
+\caption{Distribution of \textttt{amount of internships}}
+\label{fig:dist_internships}
+\end{minipage}
+\end{figure}
+
+We see in \autoref{fig:dist_working_semesters} that the amount of working semesters is heavily right skewed and unimodal. This suggests that most students worked during a miniscule amount of semesters. We also see this in the below summary table. Our first quartile is 0 and the median is just 2. Interestingly, we have an outlier who worked for a total of 15 semesters.
+
+<<echo=FALSE>>=
+summary(data$Q002)
+@
+
+\autoref{fig:dist_internships} shows us that the amount of internships is not as heavily right skewed as the amount of working semesters. Additionally, we see a mode at 0 and a second mode at 2. The below summary statistics reinforce this.
+
+<<echo=FALSE>>=
+summary(data$Q003)
+@
+
+Next, we need to combine those two variables. It is evident that the variables are not comparable as it is. Obviously, the longer a student has studied, the student will have more opportunities to work. Therefore, we need to control for the amount of total semesters. We do this by introducing two new variables:
+
+\begin{equation}
+\text{Proportion of working semesters} =
+\begin{cases}
+\frac{\text{Amount of working semesters}}{\text{Amount of semesters}} & \text{for amount of semesters} > 0\\
+0, & \text{otherwise}
+\end{cases}
+\label{eq:working_semesters}
+\end{equation}
+\begin{equation}
+\text{Internships per semester} =
+\begin{cases}
+\frac{\text{Amount of internships}}{\text{Amount of semesters}} & \text{for amount of semesters} > 0\\
+0, & \text{otherwise}
+\end{cases}
+\label{eq:internships}
+\end{equation}
+
+Using \autoref{eq:working_semesters} and \autoref{eq:internships}, we set both the amount of working semesters and internships in relation with the amount of semesters a student has studied and thus ensure comparability. 
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+work.data <- data[,c("ProportionWorkingSemesters", "InternshipsPerSemester")]
+boxplot(list(proportion_working  = data$ProportionWorkingSemesters, intern_per_sem =  data$InternshipsPerSemester))
+@
+\caption{Distribution of \textttt{proportion of working semesters} and \textttt{internships per semesters}}
+\label{fig:dist_semester_quotients}
+\end{figure}
+
+<<echo=FALSE>>=
+summary(data$ProportionWorkingSemesters)
+@
+
+<<echo=FALSE>>=
+summary(data$InternshipsPerSemester)
+@
+
+We can see both in \autoref{fig:dist_semester_quotients} and the above summary statistics that the proportion of working semesters and internships per semesters kind of share the same distribution. Both range from 0 to 1, have a similar median and are right skewed.
+
+Obviously, this does not suffice to conclude that the variables are reliable. As we want to combine the two variables, we need to investigate further whether they lend themselves to a PCA. Thus, we need to compute Cronbach`s Alpha and the KMO index to investigate reliability.
+
+<<echo=FALSE>>=
+summary(alpha(work.data))
+KMO(work.data)
+@
+
+A Cronbach`s alpha of 0.11 and a KMO index of 0.5 is a clear indication that these variables are not measuring the same thing and are inadequate for a PCA.
+
+As there are only two variables which we used to measure one latent variable, we decide to abandon the latent variable and use the measured variables individually.
+
+\paragraph{Amount of working semesters}
+
+Our first variable is the amount of working semesters and the corresponding hypothesis is: The higher the amount of working semesters the higher is a student`s aspiration for career success.
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q002, data$erfolg, xlab = "Amount of working semesters", ylab = "Aspiration for career success")
+@
+\caption{Scatter plot of \textttt{amount of working semesters} and \textttt{aspiration for career success}}
+\label{fig:scatter_working_success}
+\end{figure}
+
+\autoref{fig:scatter_working_success} shows a scatter plot in which we plot our independent variable `amount of working semesters` against the dependent variable `aspiration for career success`. Interestingly, most respondents had a low amount of semesters during which they regularly worked and a low aspiration for career success. We see a slight negative correlation between those two variables. As both are metric variables, we decide to use a linear regression model to see if there is a significant effect. Our hypotheses using a significance level of $\alpha=0.05$ are:
+
+\begin{itemize}
+\item $H_0$: The regression coefficient of the variable \textttt{amount of working semesters} is 0. $\beta_{amount of working semesters} = 0$
+\item $H_A$: The regression coefficient of the variable \textttt{amount of working semesters} is different from 0. $\beta_{amount of working semesters} \neq 0$
+\end{itemize}
+
+<<echo=FALSE>>=
+work.lm.result <- lm(erfolg ~ Q002, data)
+summary(work.lm.result)
+@
+
+The result of the ordinary least squared linear regression is that  $\beta_{amount of working semesters}$ is not significantly different from 0, as the corresponding p-value is $0.124 > \alpha$. Therefore, there is no evidence that the aspiration for career success is dependent upon the amount of semesters in which a student worked.
+
+We still need to verify whether the linear model is adequate for our data. For a linear model $y=\beta_0 + \beta_1 x + \epsilon$ to hold, $\epsilon$ (the residuals) need to be normally distributed, i.e. have a mean of 0 and a constant variance (homoscedasticy). We see in the first plot of \autoref{fig:diag_work_linear} that the residuals have a constant mean of 0, but are heteroscedastic (the variance of the residuals depends on $x$). The second plot shows us that the residuals have slightly heavier tails than a normal distribution. Especially the heteroscedasticity indicates that the linear model is not really adequate. As the consequence of heteroscedasticity is often a lower p-value and our p-value is greater than our significance level regardless, we can conclude that our findings using the linear model still hold.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(work.lm.result, which = c(1))
+@
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(work.lm.result, which = c(2))
+@
+\end{minipage}
+\caption{Diagnostic plots for the linear model aspiration for career success $\sim$ amount of working semesters}
+\label{fig:diag_work_linear}
+\end{figure}
+
+
+\paragraph{Amount of internships}
+We move to our second variable - the amount of internships - with the corresponding hypothesis: The more internships a student has had the higher is a student`s aspiration for career success.
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q003, data$erfolg, xlab = "Amount of internships", ylab = "Aspiration for career success")
+@
+\caption{Scatter plot of amount of internships and aspiration for career success}
+\label{fig:scatter_intern_success}
+\end{figure}
+
+\autoref{fig:scatter_intern_success} shows a scatter plot in which we plot our independent variable `amount of internships` against the dependent variable `aspiration for career success`. Interestingly, most data is located in a kind of a reverse angle bisector. Seemingly, only one respondent had a high amount of internships and aspiration for career succcess.
+We see a clear negative correlation between those two variables. As both are metric variables, we decide to use a linear regression model to see if there is a significant effect. Our hypotheses using a significance level of $\alpha=0.05$ are:
+
+\begin{itemize}
+\item $H_0$: The regression coefficient of the variable \textttt{amount of internships} is 0. $\beta_{amount of internships} = 0$
+\item $H_A$: The regression coefficient of the variable \textttt{amount of internships} is different from 0. $\beta_{amount of internships} \neq 0$
+\end{itemize}
+
+<<echo=FALSE>>=
+intern.lm.result <- lm(erfolg ~ Q003, data)
+summary(intern.lm.result)
+@
+
+The result of the ordinary least squared linear regression is that  $\beta_{amount of internships}$ is significantly different from 0, as the corresponding p-value is $0.006 < \alpha$. Thus, there is significant evidence in our data that the aspiration for career success is dependent upon the amount of semesters in which a student worked. As our estimate of $\beta_{amount of internships}$ is negative (-0.23), we know that there is a negative dependence. This makes for an interesting finding: Our data suggests that the more internships a student has had, the less is the student's aspiration for career success.
+
+Again, we need to verify whether the linear model is adequate for our data. We see in the first plot of \autoref{fig:diag_intern_linear} that the residuals have a constant mean of 0 and are only slightly heteroscedastic. The second plot shows us that the residuals have slightly heavier tails than a normal distribution. Overall we see that the assumption of normal distribution holds for our linear model. Therefore, we can conclude that our findings using the linear model still hold.
+
+Additionally, we need to determine whether there is another independent variable at play here. One might assume that the total amount of semesters influences the marginal effect of the amount of internships. We conduct a multivariate linear regression to control for this.
+
+<<echo=FALSE>>=
+intern.lm.result.2 <- lm(erfolg ~ Q003 + Q015, data)
+summary(intern.lm.result.2)
+@
+
+We see in the above test output that the amount of internships is still significant (p-value of 0.02) even if we control for the amount of semesters (which does not have a significant impact).
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(intern.lm.result, which = c(1))
+@
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(intern.lm.result, which = c(2))
+@
+\end{minipage}
+\caption{Diagnostic plots for the linear model aspiration for career success $\sim$ amount of internships}
+\label{fig:diag_intern_linear}
+\end{figure}
+
+\subsubsection{Hypothesis 2}
+
+The second hypothesis is: The higher the parental support during university, the higher is a student’s aspiration for career success.
+The latent independent variable was measured using seven  items. In the following demonstration the items were referenced by an alias. The enumeration below shows the meaning of the alias in detail:
+
+\begin{description}
+\item[Housing:] financial support for costs related to accommodation
+\item[Books:] financial support for costs related to books and learning resources which were required by the university
+\item[Fees:] financial support for costs related to study fees
+\item[Travel:] financial support for costs related to travel and transport costs
+\item[Food:] financial support for costs related to food
+\item[Allowance:] financial support for extraordinary performance or allowance
+\item[Expenses:] financial support for expenses, especially monthly invoices
+\end{description}
+
+
+The summary statistics of the seven items can be found in the table below. The participants were able to choose one out of five possible answers and the lower the value the higher is the support of the parents.
+
+<<echo=FALSE>>=
+support.data <- data[,c("Q004_SQ001", "Q004_SQ002", "Q004_SQ003", "Q004_SQ004", "Q004_SQ005", "Q004_SQ006", "Q004_SQ007")]
+names(support.data) <- c("Housing","Books", "Fees", "Travel", "Food", "Allowance", "Expenses")
+support.data <- factors.as.numeric(support.data)
+@
+
+<<echo=FALSE>>=
+summary(support.data)
+@
+
+In the summary statistics one can see that the mean as well as the median are lower than three, meaning that most of the people were financially supported by their parents during their studies. In fact, we can assume this by at least 75\% of our conducted candidates, since the third quantile of every variable is lower than three.
+This can be also seen in the boxplots in Figure 16. By looking at the distribution of the data one can say, that the variables \textit{housing}, \textit{books} and \textit{travel} are normally distributed whereas the variables \textit{fees}, \textit{allowance} and \textit{expenses} seem to be right skewed. In addition the distribution of food is left skewed. Moreover, both food and allowance have two outliers, which have a negative effect on the means precision.
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+boxplot(support.data,cex.axis=0.8, main="Distribution of the parental support items")
+@
+\label{fig:boxplotSupportDataVariabless}
+\caption{Distribution of the parental support items}
+\end{figure}
+
+
+
+At the beginning of the analysis we want to test the reliability of the data. Therefore, we start by looking at Cronbach`s alpha.
+
+<<echo=FALSE>>=
+
+support.alpha <- alpha(support.data)
+support.kmo.pre <- KMO(support.data)
+summary(support.alpha)
+print('Reliability if an item gets dropped:')
+support.alpha$alpha.drop['raw_alpha']
+@
+
+As it is shown the Cronbach´s alpha is 0.86 which is already quite good. However, we are able to improve this value. The table "Cronbach`s alpha when an item gets dropped" shows that the Cronbach`s alpha will increase after removing the item \textit{Housing}.
+
+<<echo=FALSE>>=
+support.data <- support.data[-1]
+support.alpha <- alpha(support.data)
+summary(support.alpha)
+@
+
+As we can see removing the \textit{Housing} variable, increased the Cronbach´s alpha by 0.02 from 0.86 to 0.88
+
+Afterwards, we are testing whether a PCA is suitable for our variables or not. This is done by the Kaiser, Meyer, Olkin Measure of Sampling Adequacy (MSA). The result of the MSA can be a value between 0 and 1, but the higher the value the better is the data suited for a PCA.
+
+<<echo=FALSE>>=
+KMO(support.data)
+@
+
+The result, of the MSA analysis shows that the data is quite suitable for a PCA, since we got a 0.86.
+
+\begin{figure}[h]
+\begin{minipage}{0.7\textwidth}
+
+
+<<echo=FALSE, fig=TRUE>>=
+pca.result <- principal(support.data, nfactors = 1, scores = TRUE)
+support.scores <- pca.result$scores[,'PC1']
+data["ParentalSupport"] <- support.scores
+plot(pca.result$value, type = 'b', main = 'Screeplot', ylab="Eigenvalues" ,xlab="Components")
+@
+\end{minipage}
+\label{fig:screeplotSupportData}
+\caption{Screeplot}
+\end{figure}
+
+However, before applying the PCA we checked the eigenvalues by looking at the Screeplot in Figure 17. There we can see that only one component got an eigenvalue bigger than two. Because of this and the elbow criteria which says that we should cut a line at the first drop of the eigenvalues between the components, we decided to use only one component for further analysis. This component was named \textit{Parental Support}. The loadings of the component are displayed in \autoref{fig:loadingPCASupportData}. There it is shown that all variables have loadings higher than 0.7. Consequently, we are using all variables for in the \textit{Parental Support} component.
+
+\begin{figure}[h]
+\begin{minipage}{0.7\textwidth}
+<<echo=FALSE, fig.height=5>>=    
+barplot(pca.result$loadings[,1], names.arg = names(support.data), main = "Item loadings on parental support factor", ylab = "Loading", xlab = "Items")
+@   
+ \end{minipage}
+    \caption{Item loadings on parental support factor}
+    \label{fig:loadingPCASupportData}
+\end{figure}
+
+In \autoref{fig:histogramSupportDataFactor} one can see that the distribution of the newly defined variable is right skewed.
+
+\begin{figure}[h]
+   \begin{minipage}{0.7\textwidth} 
+    <<echo=FALSE, fig=TRUE>>=
+        hist(data$ParentalSupport, xlab="Parental Support",main="Histogram of parental support factor")    
+    @
+    \caption{Histogram of parental support factor}
+    \label{fig:histogramSupportDataFactor}
+    \end{minipage}
+\end{figure}
+
+At the end we tested the interaction of the dependent and independent variable with a linear regression.
+Our hypotheses using a significance level $\alpha=0.05$ are:
+\begin{itemize}
+\item $H_0$: The regression coefficient of the variable \textttt{parental support} is 0. $\beta_{parental support} = 0$
+\item $H_A$: The regression coefficient of the variable \textttt{parental support} is different from 0. $\beta_{parental support} \neq 0$
+\end{itemize}
+
+<<echo=FALSE>>=
+lm.result <- lm(erfolg ~ ParentalSupport, data)
+summary(lm.result)
+@
+
+The results of the linear regression in the obve table shows that the p-value of 0.0005 is lower than 0.05. Therefore, we know that $\beta_{parental support}$ is significantly different from 0. As the estimate of $\beta_{parental support}$ is positive, we know that higher support of parents leads to a higher aspiration for career success.
+
+Nevertheless, we still have to verify the linear model. By looking at the first plot in \autoref{fig:diagnosticSupportData} we can see that the average value of the residuals (red line) is located near zero. But we do experience some heteroscedacity. During testing, we found no fitting measured variable which could explain this. Additionally, the p-value is very low. Thus, we proceed on the assumption that our linear model holds. Furthermore, the QQ-Plot on the right side shows that the data is normally distributed, since the residuals are lined very straight with just a few residuals mismatching this criteria.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(work.lm.result, which = c(1))
+@
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE>>=
+plot(work.lm.result, which = c(2))
+@
+\end{minipage}
+\caption{Diagnostic plots for the linear model aspiration for career success $\sim$ parental support}
+\label{fig:diagnosticSupportData}
+\end{figure}
+
+
+\subsubsection{Hypothesis 3}
+
+The third hypothesis is: The higher the cost of living of a student, the higher is the student's aspiration for career success. We measured the independent variable using an ordinal scale. \autoref{fig:dist_living_cost} shows the distribution of this variable. One might be tempted to assume that the variable is normally distributed. However, please keep in mind that it is a \emph{categorical} variable, and not even interval scaled at that.
+
+We see in \autoref{fig:dist_living_cost} that there are only few observations in the first and last category. We decide to merge them with their respective nearest category. \autoref{fig:dist_living_cost_2} shows the resulting distribution.
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q005, ylab = "Frequency", main = "Distribution of cost of living")
+@
+\caption{Distribution of cost of living before merge}
+\label{fig:dist_living_cost}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+levels(data$Q005)[1] <- levels(data$Q005)[2]
+levels(data$Q005)[1] <- "0-350€"
+levels(data$Q005)[4] <- levels(data$Q005)[3]
+levels(data$Q005)[3] <- ">600€"
+plot(data$Q005, ylab = "Frequency", main = "Distribution of cost of living")
+@
+\caption{Distribution of cost of living after merge}
+\label{fig:dist_living_cost_2}
+\end{minipage}
+\end{figure}
+
+In order to investigate our hypothesis, we need to look at the `aspiration of career success` distribution in the respective categories. \autoref{fig:box_success_living_cost} shows parallel boxplots for every category. We see that the median of the "351-600€" category might be significantly different from the others. Furthermore, we see that only the aspiration for career success distribution for the "351-600€" category is normally distributed. We therefore need to use a robust test to prove our hypothesis. As the independent variable is categorical and the dependent variable is metric, we will test for the difference of location in the respective category distributions. We decide to use the Kruskall-Wallis test using a significance level $\alpha=0.05$ with the following hypotheses:
+
+\begin{itemize}
+\item $H_0$: $\mu^{aspiration}_{0-350€} = \mu^{aspiration}_{351-600€} = \mu^{aspiration}_{>600€}$
+\item $H_A$: At least one $\mu$ is different
+\end{itemize}
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+boxplot(erfolg ~ Q005, data, ylab = "Aspiration for career success", main = "Distribution of aspiration in cost of living categories")
+@
+\caption{Distribution of aspiration in cost of living categories}
+\label{fig:box_success_living_cost}
+\end{figure}
+
+<<echo=FALSE>>=
+kruskal.test(erfolg ~ Q005, data)
+@
+
+We see that the test results in a p-value of 0.1, which is greater than our significance level. Therefore, we cannot reject $H_0$. There is no evidence in our data that the cost of living has an impact on the aspiration for career success.
+
+\subsubsection{Hypothesis 4}
+
+The fourth hypothesis is: The more social welfare a student enjoys, the higher is the student's aspiration for career success. We measured the independent variable using an ordinal scale with four levels. \autoref{fig:dist_social} shows the distribution of this variable. Keep in mind that our variable is neither metric nor interval scaled.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q006, ylab = "Frequency", main = "Distribution of social welfare")
+@
+\caption{Distribution of social welfare}
+\label{fig:dist_social}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+levels(data$Q006)[4] <- levels(data$Q006)[3]
+levels(data$Q006)[3] <- ">250€"
+plot(data$Q006, ylab = "Frequency", main = "Distribution of social welfare")
+@
+\caption{Distribution of social welfare after merge}
+\label{fig:dist_social_2}
+\end{minipage}
+\end{figure}
+
+We see in \autoref{fig:dist_social} that there are only few observations in the last two categories. We decide to merge these categories. \autoref{fig:dist_social_2} shows the resulting distribution.
+
+In order to investigate our hypothesis, we need to look at the `aspiration of career success` distribution in the respective categories. \autoref{fig:box_success_welfare} shows parallel boxplots for every category. We see that the median of the "0-100€" category might be significantly different from the others. Furthermore, we see that none of the categories is normally distributed. We therefore need to use a robust test to prove our hypothesis. We decide to use the Kruskall-Wallis test using a significance level $\alpha=0.05$ with the following hypotheses:
+
+\begin{itemize}
+\item $H_0$: $\mu^{aspiration}_{0-100€} = \mu^{aspiration}_{101-250€} = \mu^{aspiration}_{>250€}$
+\item $H_A$: At least one $\mu$ is different
+\end{itemize}
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+boxplot(erfolg ~ Q006, data, ylab = "Aspiration for career success", main = "Distribution of aspiration in social welfare categories")
+@
+\caption{Distribution of aspiration in social welfare categories}
+\label{fig:box_success_welfare}
+\end{figure}
+
+<<echo=FALSE>>=
+kruskal.test(erfolg ~ Q006, data)
+@
+
+We see that the test results in a p-value of 0.5, which is greater than our significance level. Therefore, we cannot reject $H_0$. There is no evidence in our data that the amount of social welfare has an impact on the aspiration for career success.
+
+\subsubsection{Hypothesis 5}
+
+The fifth hypothesis is: The more grants and scholarships a student receives, the higher is the student's aspiration for career success. We measured the independent variable using an ordinal scale with four levels. \autoref{fig:dist_grants} shows the distribution of this variable.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q007, ylab = "Frequency", main = "Distribution of grants")
+@
+\caption{Distribution of grants}
+\label{fig:dist_grants}
+\end{minipage}
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+levels(data$Q007)[4] <- levels(data$Q007)[2]
+levels(data$Q007)[3] <- levels(data$Q007)[2]
+levels(data$Q007)[2] <- "yes"
+levels(data$Q007)[1] <- "no"
+plot(data$Q007, ylab = "Frequency", main = "Distribution of grants")
+@
+\caption{Distribution of grants}
+\label{fig:dist_grants_2}
+\end{minipage}
+\end{figure}
+
+We see in \autoref{fig:dist_grants} that no respondents receive more than 1000€ in grants and only four receive more than 500€. To our knowledge, there are no grants awarded which are worth less than 500€ yearly. We therefore assume that only 4 of our respondents received any grants. This is obviously a very small sample. Nonetheless, we proceed with our hypothesis and convert the independent variable into a dichotomous variable: Does a student receive grants or not? \autoref{fig:dist_grants_2} shows the new distribution.
+
+In order to investigate our hypothesis, we need to look at the \texttt{aspiration of career success} distribution in the two categories. \autoref{fig:box_success_grants} shows parallel boxplots for both categories. There seems to be a significant difference in the medians. Apparently, students who receive grants have less aspiration for career success. 
+
+We use a statistical test to see if this holds up. Since both groups are not normally distributed, we need to use the robust Kruskall-Wallis test.
+
+Our test hypotheses using a significance level $\alpha=0.05$ are:
+
+\begin{itemize}
+\item $H_0$: $\mu^{aspiration}_{no grants} = \mu^{aspiration}_{receives grants}$
+\item $H_A$: At least one $\mu$ is different
+\end{itemize}
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+boxplot(erfolg ~ Q007, data, ylab = "Aspiration for career success", main = "Distribution of aspiration in grant categories")
+@
+\caption{Distribution of aspiration in grant categories}
+\label{fig:box_success_grants}
+\end{figure}
+
+<<echo=FALSE>>=
+kruskal.test(erfolg ~ Q007, data)
+@
+
+The p-value is 0.04, which is lower than our $\alpha$. Therefore, we can reject $H_0$ and accept $H_A$. There is evidence that students who receive grants have significantly lower aspiration for career success. Keep in mind that our sample size of grant-receiving students is only 4.
+
+\subsubsection{Hypothesis 6}
+
+The sixth hypothesis is: The more monthly financial capital a student has available, the higher is a student's aspiration for career success. We measured the independent variable using an ordinal scale with five levels. \autoref{fig:dist_capital} shows the distribution of this variable. Keep in mind that our variable is neither metric nor interval scaled.
+
+\begin{figure}[h]
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+plot(data$Q008, ylab = "Frequency", main = "Distribution of monthly available capital")
+@
+\caption{Distribution of monthly available capital}
+\label{fig:dist_capital}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+<<echo=FALSE, fig=TRUE>>=
+levels(data$Q008)[5] <- levels(data$Q008)[4]
+levels(data$Q008)[4] <- ">1000€"
+plot(data$Q008, ylab = "Frequency", main = "Distribution of monthly available capital")
+@
+\caption{Distribution of monthly available capital after merge}
+\label{fig:dist_capital_2}
+\end{minipage}
+\end{figure}
+
+We see in \autoref{fig:dist_capital} that there are only few observations in the last last category. We decide to merge it with the prior category. \autoref{fig:dist_capital_2} shows the resulting distribution.
+
+In order to investigate our hypothesis, we need to look at the \texttt{aspiration of career success} distribution in the respective categories. \autoref{fig:box_success_capital} shows parallel boxplots for every category. We see that the difference between the medians is rather minute. Additionally, we can see that the factor scores are not normally distributed in the 0-200€, 501-1000 and $>1000$ categories.
+
+We use a statistical test to back up our visual intuition. Due to the above insights, we know that we need a robust test. We decide to use the Kruskal-Wallis test using a significance level $\alpha=0.05$ with the following hypotheses:
+
+\begin{itemize}
+\item $H_0$: $\mu^{aspiration}_{0-200€} = \mu^{aspiration}_{201-500€} = \mu^{aspiration}_{501-1000€} = \mu^{aspiration}_{>1000€}$
+\item $H_A$: At least one $\mu$ is different
+\end{itemize}
+
+\begin{figure}[h]
+<<echo=FALSE, fig=TRUE>>=
+boxplot(erfolg ~ Q008, data, ylab = "Aspiration for career success", main = "Distribution of aspiration in available capital categories")
+@
+\caption{Distribution of aspiration in available capital categories}
+\label{fig:box_success_capital}
+\end{figure}
+
+<<echo=FALSE>>=
+kruskal.test(erfolg ~ Q008, data)
+@
+
+We see that the test results in a p-value of 0.2, which is greater than our significance level. Therefore, we cannot reject $H_0$. There is no evidence in our data that the amount of available monthly capital has an impact on the aspiration for career success.
+
+\subsubsection{Hypothesis 7}
+
+The seventh hypothesis is: The better the students' living situation during their studies, the higher the aspiration for career success.
+
+The independent variable of this hypothesis "students´ living situation" was divided into four items:
+
+\begin{itemize}
+    \item Type of Housing
+    \item Roommates
+    \item Condition of Housing
+    \item Space
+\end{itemize}
+
+<<echo=FALSE>>=
+data$Q012 <- factor(data$Q012, levels=rev(levels(data$Q012)))
+wohn.data <- data[,c("Q009", "Q010", "Q011", "Q012")]
+names(wohn.data) <- c("TypeOfHousing","Roommates","ConditionOfHousing","Space")
+wohn.data <- factors.as.numeric(wohn.data)
+
+@
+
+In the below plots one can see the characteristics of each individual variable.
+First of all one can see the variable \textit{Type of Housing} in \autoref{fig:barplotTypeOfHosing}. This plot shows that most of the participants either have their own property or live in a supported property. The fact that the "own property" bar might be higher than the others could be that a lot of students still live at their parents'. 
+
+
+\begin{figure}[h]
+\begin{minipage}{.7\textwidth}
+    <<echo=FALSE>>=
+barplot(table(wohn.data[,"TypeOfHousing"]), names=c("own property","rented property","supported property","dorm"),cex.names=0.9)
+@
+    \caption{Barplot Type of Housing}
+    \label{fig:barplotTypeOfHosing}
+\end{minipage}
+\end{figure}
+
+The assumption we concluded from the characteristics of the \textit{Type of Housing} variable in Figure \autoref{fig:barplotTypeOfHosing} can also be seen in Figure \autoref{fig:barplotRoommates}, were it is shown that most of the conducted people live with their parents. The interesting fact is that just a few people live alone. By looking at the distribution of the \textit{Roommates} and \textit{Type of Housing} variable, one can assume that a lot of candidates live in a supported or rented property with one or more other people. However, even though over 40 participants of the survey share their space with other people just a few live in a dorm as you can see in the first barplot.
+
+
+\begin{figure}[h]
+\begin{minipage}{.7\textwidth}
+
+    <<echo=FALSE>>=
+    barplot(table(wohn.data[,"Roommates"]), names=c("alone","with the partner","with >=1 roommate","parents"),cex.names=0.9)
+@
+    \caption{Barplot Roommates}
+    \label{fig:barplotRoommates}
+\end{minipage}}
+\end{figure}
+
+
+
+<<echo=FALSE>>=
+    summary(wohn.data[,3:4])
+@
+
+Continuing with the variable \textit{Condition of Housing}, one can see in the summary statistics above that the median and mean are located near one which is also the minimum. The boxplot in figure \ref{fig:boxplotSpaceAndCondition} shows the same since the median is at the bottom of the plot. This means that at least 50% of the people are totally satisfied with their housing condition and by looking at the third quantile at least 75% are either totally satisfied or satisfied.
+Overall we have a very strong tendency to the positive factors. 
+
+Although, most of the people are satisfied with their housing condition they just have a few square metres to live. This is shown by the \textit{Space} variable in the summary statistics. The mean and the median are located near 2 as well as the third quantile. This means that most of the people have less than 35 square metres own space which can also be seen in the boxplot in figure \ref{fig:boxplotSpaceAndCondition}, since the median is on the same position as the third quantile. Nevertheless, by respecting the case that most of the conducted people share their living space with other people, less than 35square metres own space can still be a lot in a dorm or shared property.  
+
+\begin{figure}[h]
+\begin{minipage}{.7\textwidth}
+
+
+    <<echo=FALSE>>=
+    boxplot(wohn.data[,3:4])
+@
+    \caption{Boxplot of Condition of Housing and Space}
+    \label{fig:boxplotSpaceAndCondition}
+\end{minipage}
+\end{figure}
+
+
+In the next step we are going to show the results of the analyzing part.
+First of all, we started by testing the reliability of the data in order to be sure that our variables measure the same latent variable.
+
+<<echo=FALSE>>=
+    wohn.alpha <- alpha(wohn.data, check.keys=T)
+    summary(wohn.alpha)
+    print('Reliability if an item gets dropped:')
+    wohn.alpha$alpha.drop['raw_alpha']
+@
+
+In the first step we were calculating the Cronbach`s alpha for all variables and got a result of 0.22. Since the result is very bad we can conclude that this combination of variables do not meassure the same latent variable. However, as we can see at the table "Reliability if an item gets dropped" we are able to improve the Cronbach`s alpha by dropping some variables.
+
+<<echo=FALSE>>=
+wohn.alpha <- alpha(wohn.data[,c(1,3:4)])
+print('Reliability if an item gets dropped:')
+wohn.alpha$alpha.drop['raw_alpha']
+save.image(file = "session.RData")
+@
+
+Nevertheless, it was only possible to improve the Cronbach`s alpha to 0.55 as one can see  in the results above. In the table "Reliability if an item gets dropped" it is shown that the Cronbach`s alpha will decrease in further dropping steps. Even though, a lot of different combinations of the variables were tried a 0.55 was the highest value reached.
+
+According to these results, we are not able to make a statement about the proposed hypothesis since the underlying items of the dependent variable do not reliable measure the variable we want them to me measure. Therefore, we decided to stop analyzing this hypothesis in order to prevent assumptions made on unreliable data. The steps we can take in the future is to define other items for the dependent variable as well as increase our sample size. 

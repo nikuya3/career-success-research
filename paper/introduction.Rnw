@@ -1,0 +1,2 @@
+\section{Introduction}
+In this paper we research the effect of available financial capital on a student's aspiration for career success. \autoref{sec:theory} explains the theoretical foundations underlying our work. \autoref{sec:survey} describes our  methodological framework for conducting our research. \autoref{sec:empirical} details the statistical results of our survey. \autoref{sec:limitations} lists the shortcomings of our approach.

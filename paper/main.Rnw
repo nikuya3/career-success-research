@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Subsection}
+
+\begin{document}
+
+\begin{titlepage}
+\title{An Inquiry Into the Influence of Financial Capital On Students' Aspiration for Career Success}
+
+\author{Group 4}
+\date{January 2019}
+
+\maketitle
+\end{titlepage}
+
+\begin{abstract}
+    In this paper, we investigate the influence of available financial capital on a student's aspiration for career success. We conduct a comprehensive survey among Austrian students (sample size: $N=98$) and perform an empirical evaluation using the R programming language \cite{R}. Our evaluation shows that parental support is the best indicator for aspiration for career success. Additionally, we find that recipients of grants or scholarships and students with a high amount of internships have significantly lower aspiration for career success.
+\end{abstract}
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+
+\input{introduction}
+\input{theory}
+\input{survey}
+\input{empirical}
+\input{limitations}
+\input{conclusio}
+
+\bibliographystyle{plain}
+\bibliography{sources}
+
+\clearpage
+\input{appendix}
+
+\end{document}

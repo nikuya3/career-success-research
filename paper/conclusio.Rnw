@@ -1,0 +1,15 @@
+\section{Conclusio}
+
+In this paper, we investigated the impact of available financial capital on students' career aspiration. During our work, we refined our original research questions regarding overall career aspiration to just monetary career success aspiration. This proved to be a more reliable measure. Using our literature \cite{beruflicheerwartungen} \cite{Ishak2015} we defined seven hypotheses revolving around this matter. In order to validate our assumptions, we conducted a survey among Austrian students.
+
+In total, we derived 3 significant results from our data. We have evidence in our data to back up our hypothesis that a higher parental support leads to a higher aspiration for career success. Our data also leads us to the curious conclusion that recipient of grants and scholarships have a lower aspiration for career success (albeit we only had 4 respondents who received grants). Furthermore, we also reached the result that having had more internships during studies lowers the aspiration for career success.
+
+All our other hypotheses could not be proven. We found that while the amount of internships significantly affects the aspiration for career success, the amount of semesters during which a student regularly worked does not. Furthermore, we had no evidence that the cost of living, social welfare or even monthly available capital have an impact on the aspiration for career success. To our dismay, our hypothesis regarding housing conditions affecting the aspiration for career success led to a dead end, as we did not measure this variable reliably.
+
+It can not be stated often enough that our sample size $N=98$ is very low and not representative.
+
+\subsection{Further research questions}
+
+In our view, the most interesting finding is that recipients of grants and scholarships have a lower aspiration for career success. We did not find any literature regarding this matter. It warrants further research to assess and refine our findings. In our hypotheses building process, we assumed exactly the opposite of what our data suggests. Intuitively, one would assume that recipients of grants and scholarships are more ambitious than others. Maybe their ambition is only directed towards academic success?
+
+Another interesting result is that more internships lead to a lower aspiration for career success. Here, too, we have assumed otherwise in our hypothesis. Do the (often unpaid) internships leave an inhibitory effect on the interns? Is interning at companies a sign that students were unable to find regular (part-time) jobs? Clearly, this also leads to important research question. 

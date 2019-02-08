@@ -1,0 +1,94 @@
+\section{Survey Method}
+\label{sec:survey}
+
+In this section we are explaining the process of developing our seven hypotheses. Therefore, we focus on the part of operationalization, since we will explain each hypotheses and its associated items in detail.
+
+Furthermore, we are going to outline the survey execution from the beginning to the end and we will present the methods and tools that helped us with this task.
+
+\subsection{Hypothesis Building}
+\label{subsec:hypothesis}
+
+Based on sample insights gained from existing literature  and our own research ideas we formulated seven distinct hypotheses regarding the impact of financial capital on a student’s aspiration for career success. Some of our formulated hypotheses are subject to change, due to our statistical evaluation of our data later on. All seven hypotheses are directed context hypotheses.\\
+
+1.\textit{ The more a student has worked during his/her studies, the higher is the student’s aspiration for career success.}\\
+
+2.\textit{ The higher the parental support during university, the higher is a student’s aspiration for career success.}\\
+
+3.\textit{ The higher the cost of living of a student, the higher is  the  student’s  aspiration  for  career  success.}\\
+
+4.\textit{ The more social welfare a student enjoys, the higher is  the  student’s  aspiration  for  career  success.}\\
+
+5.\textit{ The more grants and scholarships a student receives, the higher is the student’s aspiration for career success.}\\
+
+6.\textit{ The  more  monthly  financial  capital  a  student  has available, the higher is a student’s aspiration for career success. }\\
+
+7.\textit{ The better the living situation of a student is, the higher is a student’s aspiration for career success.}\\
+
+In all our hypotheses we use the same dependent variable, the aspiration for career success. 
+
+First, an explanation of the operationalization of the dependent variable is needed. This variable is a latent variable, meaning several indicators to form practical conclusions about it were needed.
+
+We choose several indicators, given in literature \cite{beruflicheerwartungen} that fit with our own definition of “a student’s aspiration for career success”. Those indicators can be assigned to three different dimensions of meaning of our variable aspiration of career success. The first dimension "reputation" includes one indicator the "reputation of the company". The second dimension "monetary success" includes two indicators, "income" and "advancement opportunities". The third and final dimension "education" includes three indicators, "technical training", "continuing previous education" and "a job offer in the subject area".
+
+Our operationalization method was a Likert-Scale, the most commonly used approach to scaling responses in surveys regarding attitude. 
+
+The Interval scale we used had five different levels ranging from "strongly agree" and "agree" to "strongly disagree" and "disagree" with “indifferent” in the middle. We formulated our items accordingly, so that you could answer them with expression of attitude.\\
+
+In our first hypothesis "The more a student has worked during his/her studies, the higher is the student’s aspiration for career success." we use the amount a student has worked during his or her studies as our independent variable. This is a latent construct with underlying meanings.
+
+To gain the information we want, we split our variable into three sub parts: the amount of semesters enrolled, the amount internships completed, and the amount of semesters where the student was regularly working. We defined "working regularly" as more than ten work hours a week. We explain this in our survey right before the associated items.
+
+We used three single questions with interval scaling as an operationalization method. Based on those three answers we can formulate an opinion about our overlying variable.\\
+
+For our second hypothesis "The higher the parental support during university, the higher is a student’s aspiration for career success.", the extent of parental support is our independent variable.
+
+It is a latent variable that cannot be easily measured so, we thought of several manifest indicators to better describe it. We ask about the support regarding housing, study material, food, allowance, and monthly expenses.
+
+The instrument we used to measure our data was a Likert-Scale, the most commonly used scale for questions regarding attitude. The Interval scale we used had 5 levels, "strongly agree", "agree", "indifferent" "disagree", "strongly disagree". We chose a five level Likert-Scale instead of four levels to be able to ask about indifference.
+We formulated our items according to attitude, that you could answer them with forms of agree/disagree.\\
+
+In our third hypothesis "The higher the cost of living of a student, the higher is  the student’s aspiration  for career success.", we were presented with the problem: What are costs of living? We used a definition given in literature "Costs of living, are costs that are needed to sustain a certain level of living including expenses such as housing, food, taxes, health care, clothes and recreation costs." \cite{beruflicheerwartungen} 
+
+The amount of costs of living is our independent manifest variable, meaning that we can collect our information with a single question about monthly costs. 
+
+The correct personal amount of living costs is not common knowledge, to simplify this question we used an ordinal scale with different spans of costs. Our categories range from "0 to 150 Euro", which would mean an university freshman still living at home with only minimal costs regarding leisure and food, to "more than 1000 Euro", which means a fully self sufficient student.\\
+
+For our fourth hypothesis "The more social welfare a student enjoys, the higher is the student’s aspiration for career success.", we use the amount of social welfare as our independent variable.
+
+We defined social welfare as service provided by the government to people in need of help to ensure living in decent conditions. 
+
+Our item regards the monthly income due to social welfare. We use a singular single choice question as our method of data collection. Due to the fact that the precise amount of received social welfare might not be common knowledge ,we used ordinal scaled categories. 
+
+We expected most answers to be within our "101 to 250 Euro" category, because the most commonly distributed social welfare is child support which cashes in at about 160 Euro per month.
+\\
+
+In our fifth hypothesis "The more grants and scholarships a student receives, the higher is the student’s aspiration for career success.", our independent variable here is the yearly amount of income due to grants or scholarships. 
+
+Grants or scholarships are awarded to extraordinarily students. To our knowledge there is no grant or scholarship that awards less than 500 Euros per year in Austria. 
+We ask about this independent manifest variable with a singular single choice question.
+
+We use four ordinal scaled categories starting from "0 to 500 Euro", which would mean no grant or scholarship at all and ending at "plus 2000 Euro", which means extensive support due to extraordinary performances.
+\\
+
+For our sixth hypothesis "The  more  monthly  financial  capital  a  student  has available, the higher is a student’s aspiration for career success.", The amount of available capital is our independent variable. It is a manifest variable meaning it can be measured directly using a single question, unlike a latent one. We defined our item as monthly available capital, this includes the sum of your monthly net income, social allowances, parental support through pocket money, as well as any benefit scholarships and other regular monetary income.
+First we wanted to use a ratio scale asking how much money exactly is available. But to simplify this question we instead used an ordinal scale with different ranges. The categories we created start with "0 to 200 Euro" which would be only Pocket Money and end with "more than 2000 Euro", which would mean a full-time job with experience and/or wealthy family members.\\
+  
+In our seventh hypothesis "The better the living situation of a student is, the higher is a student’s aspiration for career success.", the extent of the living situation is our latent independent variable, so we had to formulate several related indicators.
+
+We use four single choice questions to form an opinion about the living situation. We ask about current living situation as in living in a "house", "condominium", "publicly funded apartments", "apartment" and "student home". We ask about current living situation as in "living alone", "living with a partner", "living with one or several roommates" and "living at home with a legal guardian". Furthermore we ask about"satisfaction" with the current living situation and the available "space" in square meters.
+
+We rank all given answers on an ordinal scale, for example meaning "living in a house" ranks higher or better than "living in a student home". Based on all those indicators we can formulate an opinion about the extent of the living situation.
+
+\\
+
+
+\subsection{Survey Execution}
+
+After developing the survey our questions were tested by three test candidates. All of them were closely linked to one of the group members, however they still do not share the same academic background, since they have a different major and academic progress.
+All of them helped to improve the understandability and structure of the survey. After redeveloping the survey we decided to host it online with LimeSurvey \cite{limesurvey}, which is an open source tool to conduct anonymous surveys. Nevertheless, we still faced the general data protection regulation (GDPR) of the European Union and therefore, had to ask the candidates of their allowance in order to process the data. Even though, we still managed to conduct a anonymous survey since the candidates consent can not be linked to the data provided.
+
+The survey was distributed over various social networks and groups of the Wirtschaftsuniversität Wien and Technische Universität Wien. Therefore, we managed to reach a wider audience. However, our selection is still biased, since only people with social media or messaging accounts were able to answer the survey. 
+
+Eventually, the conducted survey had 100 participants. However, we had to discard two observations because of impossible data combinations that lead to the assumption that the person intentionally provided misleading data or misunderstood the questions. When the participants were asked at what stage of the studies they were, one particular participant answered that he has studied for zero semesters, however when asked about for how long the participants have been working during the studies the named participant answered that he had been working for more than zero semesters. In a similar case, when a person was asked about conducted internships during their studies they declared having completed more than zero internships while also having studied zero semesters.    
+
+Subsequently, the survey is analyzed with R \cite{R} which is a programming language for statistical computing. The results, insights and the distribution as well as the characteristics of the gathered data will be presented in the chapters below

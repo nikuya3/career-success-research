@@ -1,0 +1,6 @@
+\section{Limitations}
+\label{sec:limitations}
+
+It is important to keep in mind that our sample is not representative of the population (see \autoref{sec:descstats} and \autoref{sec:survey}). We concluded in \autoref{sec:descstats} that our sample is only representative for undergraduate students studying at Wirtschaftsuniversität Wien or Technische Universität Wien.
+
+Further note that we did not record the place of residence of students. We assume that the place of residence does not affect our findings. It is very probable that most of our respondents studied in Vienna, where most of Austrians students study.

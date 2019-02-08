@@ -1,0 +1,44 @@
+\appendix
+
+\section{Summary statistics}
+<<echo=FALSE>>=
+library(psych)
+options(warn=-1)
+library(psych)
+options(warn=-1)
+source('survey_696322_R_syntax_file.R')
+source('util.R')
+data <- clean.data(data)
+data <- data[-1]
+career.data <- read.csv('survey_696322_R_data_file.csv')
+career.data <- clean.data(career.data)
+career.data <- career.data[,2:6]
+career.names <- c('Fachliche Weiterentwicklung', 'Eine Stelle im Fachgebiet', 'income', 'Ansehen des Unternehmens', 'Aufstiegsmöglichkeiten')
+career.data <- factors.as.numeric(career.data)
+success <- career.data[c(3,5)]
+success.pca.result <- principal(success, nfactors = 1, scores = TRUE)
+success.scores <- success.pca.result$scores[,'PC1']
+names(data) <- c("continuingEducation", "jobInSubjectArea", "income", "reputation", "advancement", "workSemesters", "internships", "housingSupport", "BooksSupport", "FeesSupport", "TravelSupport", "FoodSupport", "Allowance", "ExpensesSupport", "livingCosts", "welfare", "grants", "monthlyCapital", "housingType", "roommates", "housingCondition", "space", "age", "gender", "semesters", "degree", "ProportionWorkingSemesters", "InternshipsPerSemester")
+support.data <- data[,c("BooksSupport", "FeesSupport", "TravelSupport", "FoodSupport", "Allowance", "ExpensesSupport")]
+support.data <- factors.as.numeric(support.data)
+pca.result <- principal(support.data, nfactors = 1, scores = TRUE)
+support.scores <- pca.result$scores[,'PC1']
+data['aspirationSuccess'] <- success.scores
+data["ParentalSupport"] <- support.scores
+summary(data)
+@
+
+
+\section{Survey}
+\begin{figure}[p]
+    \includegraphics[page=1, width=\linewidth]{Fragebogen.pdf}
+\end{figure}
+\begin{figure}[p]
+    \includegraphics[page=2, width=\linewidth]{Fragebogen.pdf}
+\end{figure}
+\begin{figure}[p]
+    \includegraphics[page=3, width=\linewidth]{Fragebogen.pdf}
+\end{figure}
+\begin{figure}[p]
+    \includegraphics[page=4, width=\linewidth]{Fragebogen.pdf}
+\end{figure}
