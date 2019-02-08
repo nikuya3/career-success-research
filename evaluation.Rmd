@@ -1,0 +1,391 @@
+---
+title: "Evaluation"
+output: html_document
+---
+
+```{r}
+library(psych)
+source('util.R')
+source('survey_696322_R_syntax_file.R')
+data <- data[,c(2:length(data))]
+```
+
+```{r}
+summary(data$Q002)
+data <- data[data$Q002 < 30,]
+hist(data$Q002, main = "Anzahl erwerbstatiger Semsester")
+```
+
+someone had 333 semesters -> remove
+
+```{r}
+summary(data$Q003)
+hist(data$Q003, main = "Anzahl Praktika")
+```
+
+```{r}
+summary(data$Q013)
+boxplot(data$Q013, main = "Alter")
+```
+
+
+```{r}
+summary(data$Q015)
+hist(data$Q015, main = "Anzahl Semester")
+```
+
+```{r}
+plot(data$Q016, main = "Haufigkeit akademischer Grade")
+levels(data$Q016)[3] <- levels(data$Q016)[2]
+```
+
+No respondent was a doctor, so we remove this category.
+
+
+```{r}
+data["AnteilErwerbssemester"] <- data$Q002 / data$Q015
+paste("Students with working semesters > 0 but semesters = 0: ", sum(is.infinite(data$AnteilErwerbssemester)))
+data <- data[!is.infinite(data$AnteilErwerbssemester),]
+data[is.nan(data$AnteilErwerbssemester),]$AnteilErwerbssemester <- 0
+data[data$AnteilErwerbssemester > 1,]$AnteilErwerbssemester <- 1
+```
+
+someone had Erwerbssemester > 0 while Semester = 0, which is impossible -> remove
+
+```{r}
+data["PraktikaProSemester"] <- data$Q003 / data$Q015
+paste("Students with internships > 0 but semesters = 0: ", sum(is.infinite(data$AnteilErwerbssemester)))
+data[is.infinite(data$PraktikaProSemester),]$PraktikaProSemester <- 1
+data[is.nan(data$PraktikaProSemester),]$PraktikaProSemester <- 0
+data[data$PraktikaProSemester > 1,]$PraktikaProSemester <- 1
+```
+
+
+Dependent Variable
+---
+
+Explanations in karriereerwartung.Rmd
+
+```{r}
+pca.data <- data[,c("Q001_SQ003", "Q001_SQ005")]
+indx <- sapply(pca.data, is.factor)
+pca.data[indx] <- lapply(pca.data[indx], as.numeric)
+pca.result <- principal(pca.data, nfactors = 1, scores = TRUE)
+erfolg.scores <- pca.result$scores[,'PC1']
+data["Erfolg"] <- erfolg.scores
+```
+
+
+
+Hypothesis 1
+---
+
+More work during university -> higher aspiration for career success
+
+### `Erwerbstätigkeit` index
+
+```{r}
+erwerb.data <- data[,c("AnteilErwerbssemester", "PraktikaProSemester")]
+boxplot(list(data$AnteilErwerbssemester, data$PraktikaProSemester))
+```
+
+```{r}
+alpha(erwerb.data)
+KMO(erwerb.data)
+```
+
+Anteil Erwerbssemester and Praktika pro Semester are not reliable measures (alpha = 0.11), KMO = 0.5 -> therefore PCA not really fitting
+
+We decide to test the hypothesis for both individually -> no `Erwerbstätigkeit` index
+
+### Test
+
+Does the amount of semesters in which a student worked affect the aspiration for career success?
+
+```{r}
+plot(data$Q002, data$Erfolg, xlab = "Anzahl erwerbstätige Semester", ylab = "Erfolgserwartung")
+```
+
+The plot seems to show a slight negative correlation. We use a linear regression to see if this is significant. Our hypotheses using a significance level of $\alpha=0.05$ are:
+
+* $H_0$: The regression coefficient of the variable `Anzahl erwerbstätige Semester` is 0. $\beta_{Anzahl erwerbstätige Semester} = 0$
+* $H_A$: The regression coefficient of the variable `Anzahl erwerbstätige Semester` is different from 0. $\beta_{Anzahl erwerbstätige Semester} \neq 0$
+
+```{r}
+lm.result <- lm(Erfolg ~ Q002, data)
+summary(lm.result)
+```
+
+The result of the linear regression using ordinary least squares is that  $\beta_{Anzahl erwerbstätige Semester}$ is not significantly different from 0, as the corresponding p-value is 0.124 > $\alpha$. Therefore, there is no evidence that the aspiration for career sucess is dependent upon the amount of semesters in which a student worked.
+
+We still need to look at a few plots of the linear model to see if it is useful for our dataset.
+
+```{r}
+plot(lm.result)
+```
+
+quantile-quantile not really god, residual plot ok
+
+```{r}
+plot(data$Q003, data$Erfolg, xlab = "Anzahl Praktika", ylab = "Erfolgserwartung")
+```
+
+
+```{r}
+lm.result <- lm(Erfolg ~ Q003, data)
+summary(lm.result)
+```
+
+significant: the more internships, the less Erfolg aspiration -> our hypothesis is false
+
+```{r}
+plot(lm.result)
+```
+
+quantile-quantile not really god, residual plot ok
+
+Hypothesis 2
+---
+
+higher support of parents -> higher aspiration for career success
+
+```{r}
+support.data <- data[,c("Q004_SQ001", "Q004_SQ002", "Q004_SQ003", "Q004_SQ004", "Q004_SQ005", "Q004_SQ006", "Q004_SQ007")]
+support.data <- factors.as.numeric(support.data)
+alpha(support.data)
+KMO(support.data)
+```
+
+good alpha and KMO -> PCA
+```{r}
+support.data <- support.data[-1]
+support.names <- c("Books", "Fees", "Travel", "Food", "Allowance", "Expenses")
+alpha(support.data)
+KMO(support.data)
+```
+
+
+
+```{r}
+pca.result <- principal(support.data, nfactors = 1, scores = TRUE)
+support.scores <- pca.result$scores[,'PC1']
+data["HilfeEltern"] <- support.scores
+plot(pca.result$value, type = 'b', main = 'Screeplot')
+```
+
+```{r}
+barplot(pca.result$loadings[,1], names.arg = support.names, main = "Item loadings on parental support factor", ylab = "Loading", xlab = "Items")
+```
+
+```{r}
+hist(data$HilfeEltern)
+```
+
+```{r}
+plot(data$HilfeEltern, data$Erfolg, xlab = "Parental support", ylab = "Aspiration for career success")
+```
+
+
+```{r}
+lm.result <- lm(Erfolg ~ HilfeEltern, data)
+plot(lm.result)
+```
+
+quantile and residual plots suggest that the linear model fits the data
+
+```{r}
+summary(lm.result)
+```
+
+As the p-value is lower than $\alpha$, we know that $\beta_{parental support}$ is significantly different from 0. As the estimate of $\beta_{parental support}$ is positive, we know that more support of parents leads to a higher aspiration for career success.
+
+Hypothesis 3
+---
+
+higher cost of living -> higher aspiration for career success
+
+```{r}
+plot(data$Q005)
+```
+
+ordinal scale
+
+```{r}
+boxplot(Erfolg ~ Q005, data)
+```
+
+medians do not seem to differ a lot
+
+since only 351-600 is normally distributed, we need to use a robust test -> Kruskall-Wallis test:
+
+```{r}
+kruskal.test(Erfolg ~ Q005, data)
+```
+
+insignificant -> median is not different in groups -> no evidence that aspiration for career success is dependent on cost of living
+
+Hypothesis 4
+---
+
+higher social assistance -> less aspiration for career success
+
+```{r}
+plot(data$Q006)
+```
+
+ordinal scale
+
+```{r}
+levels(data$Q006)[4] <- levels(data$Q006)[3]
+levels(data$Q006)[3] <- "über 250€"
+```
+
+too few occurences for the last two categories, so we combine them
+
+```{r}
+boxplot(Erfolg ~ Q006, data)
+```
+
+The median in category `0-100€` seems the be higher than the other medians. As the categories are not normally distributed, we use a Kruskall-Wallis test to investigate this.
+
+```{r}
+kruskal.test(Erfolg ~ Q006, data)
+```
+
+insignificant -> median is not different in groups -> no evidence that aspiration for career success is dependent on social assistance
+
+Hypothesis 5
+---
+
+more grants -> higher aspiration for career success
+
+```{r}
+plot(data$Q007)
+```
+
+ordinal scale
+
+```{r}
+summary(data$Q007)
+```
+
+only four respondents receive grants -> too small sample
+
+```{r}
+levels(data$Q007)[4] <- levels(data$Q007)[2]
+levels(data$Q007)[3] <- levels(data$Q007)[2]
+levels(data$Q007)[2] <- "ja"
+levels(data$Q007)[1] <- "nein"
+```
+
+
+convert into dichotomous variable: receive grant yes or no
+
+
+```{r}
+boxplot(Erfolg ~ Q007, data, main = "Leistungsstipendium erhalten")
+```
+
+There seems to be a significant difference in the medians. Apparently, students who receive grants have less aspiration for career success.
+
+We use a statistical test to see if this holds up. Since both groups are not normally distributed, we need to use the robust Kruskall-Wallis test.
+
+Our test hypotheses using a significance level $\alpha=0.05$ are:
+
+* $H_0: \mu^{Erfolg}_{kein Leistungsstipendium} = \mu^{Erfolg}_{Leistungsstipendium erhalten}$
+* $H_A: \mu^{Erfolg}_{kein Leistungsstipendium} \neq \mu^{Erfolg}_{Leistungsstipendium erhalten}$
+
+```{r}
+kruskal.test(Erfolg ~ Q007, data)
+```
+
+The p-value is 0.04, which is lower than our $\alpha$. Therefore, we can accept $H_A$. There is evidence that students who receive grants have significantly lower aspiration for career success.
+
+Hypothesis 6
+---
+
+more available financial capital -> higher aspiration for career success
+
+```{r}
+plot(data$Q008)
+```
+
+ordinal scale
+
+```{r}
+levels(data$Q008)[5] <- levels(data$Q008)[4]
+levels(data$Q008)[4] <- "über 1000€"
+```
+
+We see that only three observations fall into the `über 2000€` category. We therefore decided to combine this level with the `1001-2000€` level. The newly created level is simply called `über 1000`.
+
+```{r}
+boxplot(Erfolg ~ Q008, data)
+```
+
+medians do not seem to differ a lot
+
+since no category is normally distributed, we need to use a robust test -> Kruskall-Wallis test:
+
+```{r}
+kruskal.test(Erfolg ~ Q008, data)
+```
+
+insignificant -> median is not different in groups -> no evidence that aspiration for career success is dependent on available financial capital
+
+Hypothesis 7
+---
+
+better living -> higher aspiration for career success
+
+```{r}
+data$Q012 <- factor(data$Q012, levels=rev(levels(data$Q012)))
+wohn.data <- data[,c("Q009", "Q010", "Q011", "Q012")]
+wohn.data <- factors.as.numeric(wohn.data)
+alpha(wohn.data[,1:2])
+KMO(wohn.data)
+```
+
+$\alpha$ and KMO too low
+
+Let's try individual hypotheses
+
+```{r}
+boxplot(Erfolg ~ Q009, data)
+```
+
+
+```{r}
+summary.aov(aov(Erfolg ~ Q009, data))
+```
+
+significant -> housing affects aspiration for career success
+
+all the following variables are insignificant
+
+```{r}
+boxplot(Erfolg ~ Q010, data)
+```
+
+
+```{r}
+summary.aov(aov(Erfolg ~ Q010, data))
+```
+
+```{r}
+boxplot(Erfolg ~ Q011, data)
+```
+
+
+```{r}
+summary.aov(aov(Erfolg ~Q011, data))
+```
+
+```{r}
+boxplot(Erfolg ~ Q012, data)
+```
+
+
+```{r}
+summary.aov(aov(Erfolg ~ Q012, data))
+```

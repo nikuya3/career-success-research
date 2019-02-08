@@ -1,0 +1,56 @@
+---
+title: "Metric and Categorical"
+output: html_document
+---
+
+## Research question
+
+We want to know whether there is a difference between males and females with respect to our most important variable: the aspiration for career success. To that end, we formulate the following hypotheses to perform a statistical test using a significance level $\alpha=0.05$:
+
+* $H_0: \mu^{Erfolg}_{male} = \mu^{Erfolg}_{female}$
+* $H_A: \mu^{Erfolg}_{male} \neq \mu^{Erfolg}_{female}$
+
+```{r}
+library(psych)
+data <- read.csv('survey_696322_R_data_file.csv')
+data <- data[,c(3,5)]
+indx <- sapply(data, is.factor)
+data[indx] <- lapply(data[indx], as.numeric)
+pca.result <- principal(data, nfactors = 1, scores = TRUE)
+erfolg.scores <- pca.result$scores[,'PC1']
+data <- read.csv('survey_696322_R_data_file.csv')
+data['erfolg'] <- erfolg.scores
+```
+
+After we load our data, we split it along the `Geschlecht` variable.
+
+```{r}
+females <- data[data$Q014 == 1,]
+males <- data[data$Q014 == 2,]
+summary(females$erfolg)
+```
+
+Above, we see a summary statistic of the `Erfolg` variable among females.
+
+```{r}
+summary(males$erfolg)
+```
+
+If we compare the summary statistics of the `Erfolg` variable among both genders, we see that there is some difference in the means and median. We can also observe the differences in the below plot.
+
+```{r}
+boxplot(list(females$erfolg, males$erfolg), names = c('female', 'male'), ylab = 'Erfolg score')
+```
+
+The above plot shows the boxplots of both genders. We see that there exists some difference in both the median and the interquartile distance. We can also see that both boxplots are approximately normally distributed. As the female and male `Erfolg` scores are independent, we will test our prior defined hypotheses using a Two Sample t-test.
+
+
+## Test
+
+The Two Sample t-test test will test if the observed variables are equally distributed or not. 
+
+```{r}
+t.test(females$erfolg, males$erfolg)
+```
+
+As you can see in the results, the test does not yield a p-value less than $\alpha$, therefore there is no significant difference in the `Erfolg` distribution for both genders. So we can assume that both males and females have the same aspiration for career success.

@@ -1,0 +1,174 @@
+---
+title: "Karriereerwartung PCA"
+output: html_document
+---
+
+## Reliability
+We will delve into the scale for our most important variable: `Karriereerwartung`.
+This variable is used as independent variable in most of our hypotheses.
+It indicates the aspiration for a good career development after completion of studies.
+We measured this latent variable using the following five Likert items with five levels each:
+
+* `Fachliche Weiterentwicklung`
+* `Eine Stelle im Fachgebiet`
+* `Einkommen`
+* `Ansehen des Unternehmens`
+* `Aufstiegsmöglichkeiten`
+
+Let's measure the reliability of these items using Cronbach's alpha. First, we need to load the data.
+
+```{r}
+library(psych)
+data <- read.csv('survey_696322_R_data_file.csv')
+data <- data[,2:6]
+var.names <- c('Fachliche Weiterentwicklung', 'Eine Stelle im Fachgebiet', 'Einkommen', 'Ansehen des Unternehmens', 'Aufstiegsmöglichkeiten')
+```
+
+To calculate Cronbach's alpha, we need to convert the categorical variables into their numerical representation.
+
+```{r}
+indx <- sapply(data, is.factor)
+data[indx] <- lapply(data[indx], as.numeric)
+```
+
+Now we can calculate Cronbach's alpha.
+
+```{r}
+alpha(data)
+```
+
+Cronbach's alpha is 0.51. This value is relatively low and shows that our items do not measure the same latent variable.
+This means that the reliability of our measurement is not good. A Cronbach's alpha greater than 0,6 would be preferable.
+
+## Principal component analysis
+
+It seems as though our scale does not measure what we want it to measure.
+It could be the case that there are acutally more latent variables underlying our items.
+To investigate this, we will employ a Principal component analysis (PCA).
+A PCA attempts to construct components (or factors) as linear combination of items s.t. they are orthogonal to each other and capture the variance of the sample.
+
+Before we begin our PCA, let's use the KMO to measure the suitability of our data to a PCA.
+
+```{r}
+KMO(data)
+```
+
+As we see, our data is yields a KMO of 0.49, which is just barely acceptable.
+
+```{r}
+pca.result <- principal(data, nfactors = 2, scores = TRUE)
+plot(pca.result$value, type = 'b', main = 'Screeplot')
+```
+
+The result of a PCA can be visualized using a scree plot. This plot indicates
+the captured variance for each of the constructed factors.
+As a visual intuition, all factors prior to the "ellbow" in the plot are eligible factors.
+Our plot shows an elbow at the third factor, therefore we need two factors to explain the variance in our data.
+
+As a general rule of thumb, all factors with an eigenvalue greater than one are capture significant variance.
+We see that this rule, too, leads us to using the first two factors.
+The table of the principal component analysis strenghtens our decision.
+
+```{r}
+plot(pca.result$loadings, main = "Item loadings on factors")
+text(pca.result$loadings[,1], pca.result$loadings[,2] - 0.05, var.names)
+```
+
+As each factor $f$ is a linear combination of our original items $f=\sum_{i=0}^N \alpha_i l_i$
+(where $l_i$ is the $i$th item), the loading $\alpha_i$ shows the importance of the item $l_i$.
+
+The loading plot above uses this information to show the item loadings on both factors.
+
+```{r}
+factored_data <- as.matrix(predict(pca.result, data))
+colnames(factored_data) <- c("Entwicklung", "Erfolg")
+alpha(factored_data)
+```
+
+We decide to denote first factor as `Entwicklung` and second as `Erfolg`.
+
+We transform the dataset from holding the items into holding the factors for each observation.
+
+```{r}
+entwicklung <- data[c(1,2,4)]
+alpha(entwicklung)
+```
+
+`Fachliche Weiterentwicklung`, `Eine Stelle im Fachgebiet` and `Ansehen des Unternehmens` load high, ie greater than 0.4 onto `Entwicklung`. Our Cronbach's alpha using only those items is 0.55, which is still not good.
+
+```{r}
+erfolg <- data[c(3,5)]
+alpha(erfolg)
+```
+
+`Einkommen` and `Aufstiegsmöglichkeiten` load high, ie greater than 0.4 onto `Erfolg`. Our Cronbach's alpha using only those items is 0.66.
+
+The factor `Erfolg` is more reliable than `Entwicklung`. Therefore, we decide to discard the factor `Entwicklung` and use only `Erfolg` for future calculations.
+
+What this means for our research is that we do not measure the aspiration for career development of students anymore,
+but only the aspiration of career success. In other words, we decide to only focus on the "hard" indicators income and position and discard the "soft" ones.
+
+## Factor scores
+
+The `Erfolg` factor can be condensed into a metric variable for each observation. Smaller `Erfolg` scores indicate a lower aspiration for career success.
+
+Let's look at the `Erfolg` factor scores.
+
+```{r}
+data <- read.csv('survey_696322_R_data_file.csv')
+erfolg.scores <- pca.result$scores[,'RC2']
+erfolg.scores
+```
+
+
+```{r}
+hist(erfolg.scores, xlab = 'Factor score', ylab = 'Density', main = 'Factor scores for Erfolg')
+```
+
+We visualize the `Erfolg` factor score distribution using a histogram with fixed bin width. The distribution is skewed right and bimodal.
+
+```{r}
+boxplot(erfolg.scores, horizontal = T, xlab = 'Factor score', main = 'Factor scores for Erfolg')
+```
+
+The boxplot shows similar indications. We also clearly see two outliers, which might be corrupted data.
+
+```{r}
+summary(erfolg.scores) 
+```
+
+This table describes our distribution numerically. The maximum value is likely an outlier.
+
+## Research question
+
+Our research question is: Does the amount of semesters studied impact the aspiration for carrier success? Let's try to solve this question visually first.
+
+```{r}
+plot(data$Q015, erfolg.scores, xlab = 'Absolvierte Semester', ylab='Erfolg score')
+```
+
+The scatter plot shows a slight indication of a correlation of the `Absolvierte Semester` and `Erfolg` variables in our dataset. Now, we will use a correlation test to see if our visual intuition holds up. We decide to use the Pearson as well as the Spearmen correlation test using the following hypotheses:
+
+* $H_0$: The correlation coefficient between `Absolviere Semester` and `Erfolg` is 0.
+* $H_A$: The correlation coefficient between `Absolviere Semester` and `Erfolg` is not 0.
+
+```{r}
+cor.test(erfolg.scores, data$Q015, alternative = "two.sided", conf.level = 0.95, method = 'pearson')
+```
+
+```{r}
+cor.test(erfolg.scores, data$Q015, alternative = "two.sided", conf.level = 0.95, method = 'spearman')
+```
+
+Both methods yield a correlation coefficient of roughly -0.25. As the coefficient ranges from 0 to |1|, this is a small, but significant value. Therefore, there is a small negative correlation correlation between `Absolvierte Semester` and `Erfolg`.
+
+As the p-values of the correlation tests using both the Pearson (0.009) and Spearman (0.006) method are lower than our significance level of $\alpha=0.05$ we can reject $H_0$. It seems that more semesters a student has studied, the __less__ is the student's aspiration for career success.
+
+## Correlation of principal components
+
+```{r}
+entwicklung.scores <- pca.result$scores[,'RC2']
+cor(erfolg.scores, entwicklung.scores)
+```
+
+Obviously, the correlation coefficient is (almost) 0, as both principal components are linearly independent by defintion.

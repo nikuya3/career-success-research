@@ -1,0 +1,53 @@
+---
+title: "Dependent metric variable and multiple independent categorical variables"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this document we want to find out if there is an interaction between the gender and financial capital of students with respect to their aspiration for career success. For this, we need to load the data.
+
+```{r}
+library(psych)
+data <- read.csv('survey_696322_R_data_file.csv')
+data <- data[,c(3,5)]
+indx <- sapply(data, is.factor)
+data[indx] <- lapply(data[indx], as.numeric)
+pca.result <- principal(data, nfactors = 1, scores = TRUE)
+erfolg.scores <- pca.result$scores[,'PC1']
+source('survey_696322_R_syntax_file.R')
+data['erfolg'] <- erfolg.scores
+levels(data$Q008)[5] <- levels(data$Q008)[4]
+levels(data$Q008)[4] <- "über 1000€"
+```
+
+We can calculate the `Erfolg` statistics for each combination of `Geschlecht` and `Kapital`.
+
+```{r}
+describeBy(data$erfolg, group = list(data$Q008, data$Q014))
+```
+
+The above statistics are tedious to look at, so let's create a visual representation of our data. We will use interaction plots for this purpose. These plots show how the interaction between `Kapital` and `Geschlecht` affect the mean of the Erfolg score.
+
+```{r}
+interaction.plot(data$Q008, data$Q014, data$erfolg, main = "Interaction plot for Geschlecht and Kapital", xlab = "Kapital", ylab = "mean of Erfolg", trace.label = "Geschlecht")
+```
+
+```{r}
+interaction.plot(data$Q014, data$Q008, data$erfolg, main = "Interaction plot for Kapital and Geschlecht", xlab = "Geschlecht", ylab = "mean of Erfolg", trace.label = "Kapital")
+```
+
+We see in both plots that the `weiblich` and `501-1000€` combination is the only interaction that is different from the others. Apperantly, female students who have 501€-1000€ capital available have less aspiration for career success. Let's see if this holds up.
+
+We use a statistical test to see if the aforementioned difference is significant. We decide to use an ANOVA test with a significance level $\alpha=0.05$ and the following hypotheses:
+
+* $H_0$: $\mu^{Erfolg}_{0-200€,weiblich} = \mu^{Erfolg}_{0-200€,männlich} = \mu^{Erfolg}_{201-500€,weiblich} = \mu^{Erfolg}_{201-500€,männlich}\\= \mu^{Erfolg}_{501-1000€,weiblich} = \mu^{Erfolg}_{501-1000€,männlich} = \mu^{Erfolg}_{über 1001€,weiblich} = \mu^{Erfolg}_{über 1001€,männlich}$
+* $H_A$: At least one $\mu$ is different
+
+```{r}
+summary.aov(aov(erfolg ~ Q008 * Q014, data))
+```
+
+Above, we see that the ANOVA test yields a p-value for the `Kapital` effect, `Geschlecht` effect (0.4) and the interaction effect of both, which are all roughly 0.4. All of these are larger than our significance level $\alpha$. Therefore, we cannot reject $H_0$. We have no evidence for a fundamental difference in the aspiration for career success among the `Kapital` and `Geschlecht` groups.

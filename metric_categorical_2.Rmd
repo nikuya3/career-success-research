@@ -1,0 +1,61 @@
+---
+title: "Dependent Metric and Independent Categorical Variable Part 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this document, we want to answer the following research question:
+The more financial capital a student has available, the higher is a student's aspiration for career success.
+
+To answer this question, we need to load the data.
+
+```{r}
+library(psych)
+data <- read.csv('survey_696322_R_data_file.csv')
+data <- data[,c(3,5)]
+indx <- sapply(data, is.factor)
+data[indx] <- lapply(data[indx], as.numeric)
+pca.result <- principal(data, nfactors = 1, scores = TRUE)
+erfolg.scores <- pca.result$scores[,'PC1']
+source('survey_696322_R_syntax_file.R')
+data['erfolg'] <- erfolg.scores
+```
+
+Let's look at the `Kapital` variable indicating the available monthly financial capital.
+
+```{r}
+plot(data$Q008, xlab = "Kapital", ylab = "Frequency")
+```
+
+We see that only three observations fall into the `über 2000€` category. We therefore decided to combine this level with the `1001-2000€` level. The newly created level is simply called `über 1000`.
+
+```{r}
+levels(data$Q008)[5] <- levels(data$Q008)[4]
+levels(data$Q008)[4] <- "über 1000€"
+```
+
+Now let's look at the summary statistics for the specific categories.
+
+```{r}
+describeBy(data$erfolg, group = data$Q008)
+```
+
+```{r}
+boxplot(erfolg ~ Q008, data, ylab = "Erfolg scores", main = "Erfolg scores by Kapital")
+```
+
+We see in the above boxplot that the difference between the medians is rather minute. Additionally, we can see that the `Erfolg` scores are not normally distributed in the `0-200€`, `501-1000€` and `über 1000` categories.
+
+Let's see if a statistical test comes to the same conclusion. Due to the above insights, we know that we need a robust test. We decide to use the Kruskal-Wallis test using a significance level $\alpha=0.05$ with the following hypotheses:
+
+* $H_0$: $\mu^{Erfolg}_{0-200€} = \mu^{Erfolg}_{201-500€} = \mu^{Erfolg}_{501-1000€} = \mu^{Erfolg}_{über 1000€}$
+* $H_A$: At least one $\mu$ is different
+
+```{r}
+kruskal.test(erfolg ~ Q008, data)
+```
+
+The Kruskall-Wallis test yields a p-value of roughly 0.4, which is higher than our $\alpha$. Therefore, we cannot reject $H_0$. We have no significant evidence of a difference in the means of the `Kapital` groups.

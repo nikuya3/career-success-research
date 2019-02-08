@@ -1,0 +1,109 @@
+---
+title: "Regression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this document we try to answer two research questions using linear regression models. 
+
+## First research question
+
+Our first research quesetion is: The more semesters a student has studied the higher is a student's aspiration for career success.
+
+To answer our research questions, we need to load the data and calculate the `Erfolg` factor using a PCA.
+
+```{r}
+library(psych)
+data <- read.csv('survey_696322_R_data_file.csv')
+data <- data[,c(3,5)]
+indx <- sapply(data, is.factor)
+data[indx] <- lapply(data[indx], as.numeric)
+pca.result <- principal(data, nfactors = 1, scores = TRUE)
+erfolg.scores <- pca.result$scores[,'PC1']
+data <- read.csv('survey_696322_R_data_file.csv')
+data['erfolg'] <- erfolg.scores
+```
+
+Let's first look at a scatter plot for the `Erfolg` score and the `Absolvierte Semester` variable. We see that there is little correlation between those variables.
+
+```{r}
+plot(data$Q015, erfolg.scores, xlab = 'Absolvierte Semester', ylab='Erfolg score')
+```
+
+To perform a statistical test on our research question, we formulate the following hypotheses:
+
+* $H_0$: The regression coefficient of the variable `Absolvierte Semester` is 0. $\beta_{Absolvierte Semester} = 0$
+* $H_A$: The regression coefficient of the variable `Absolvierte Semester` is different from 0. $\beta_{Absolvierte Semester} \neq 0$
+
+We decide to test this using a significance level of $\alpha=0.05$.
+We see that the above test uses a regression model. In a regression model we decide that the response variable is dependent upon the predictor variable, but not vice versa. This is in contrast to correlation models, where the dependence can exist for both sides.
+
+
+```{r}
+lm.result <- lm(erfolg ~ Q015, data)
+summary(lm.result)
+```
+
+The regression test yields a p-value of 0.4025, which is greater than $a$. Therefore, we cannot accept the alternative hypothesis. The aspiration for career success does not depend on the amount of semesters.
+
+
+```{r}
+plot(lm.result)
+```
+
+To validate our linear regression model, we look at the above plots. The quantile/quantile plot shows that our data follows an approximate normal distribution. The residual plot shows that the error term is approximately centered at 0 and has a constant variance. Therefore, our model holds.
+
+```{r}
+plot(data$Q015, erfolg.scores, xlab = 'Absolvierte Semester', ylab='Erfolg score')
+abline(lm.result, col = 'red')
+legend(1, 3, c('regression line'), lty=c(1), lwd =c(2.5), col = c('red'))
+```
+
+This plot shows our linear regression model on the scatter plot. We see that there is no meaningful way to linearly describe our data.
+
+## Second research question
+
+Our second research question is: The more semesters a student has studied and the more internships a student has had the higher is a student's aspiration for career success.
+
+Again, we formulate the test hypotheses for a significance level $\alpha=0.05$. We add the following hypotheses to the ones seen above:
+
+* $H_0$: The regression coefficient of the variable `Anzahl Praktika` is 0. $\beta_{Anzahl Praktika} = 0$
+* $H_A$: The regression coefficient of the variable `Anzahl Praktika` is different from 0. $\beta_{Anzahl Praktika} \neq 0$
+
+```{r}
+lm.result.2 <- lm(erfolg ~ Q003 + Q015, data)
+summary(lm.result.2)
+```
+
+Again, our multiple linear regression model does not yield significant results. Both the p-value for `Anzahl Praktika` (0.4) and `Absolvierte Semester` (0.3) is greater than $\alpha$. Therefore, we cannot reject $H_0$.The aspiration for career success does not linearly depend on the amount of semesters and internships.
+
+```{r}
+plot(lm.result.2)
+```
+
+Again, we look at the quantile-quantile plot. It shows an approximate normal distribution and the residual plot shows a mean of 0 and constant variance (if you squint your eyes).
+
+## Predictions
+
+We want to show how our linear model changes if we change the variables. The predictions of our models are calculated using the formula:
+
+$Y=\alpha+\beta_1X_1+\beta_2X_2$
+
+To show the difference formulated above, we will use the following calculations:
+
+$y_{original}=\alpha+\beta_1\bar{x}_1+\beta_2\bar{x}_2$
+
+$y_{new}=\alpha+\beta_1(\bar{x}_1 + 1)+\beta_2(\bar{x}_2 - 2)$
+
+```{r}
+x.test.o <- data.frame(Q003 = mean(data$Q003), Q015 = median(data$Q015))
+y.o <- predict(lm.result.2, x.test.o)
+x.test.n <- data.frame(Q003 = mean(data$Q003) + 1, Q015 = median(data$Q015) - 2)
+y.n <- predict(lm.result.2, x.test.n)
+print(c(original = y.o, new = y.n, difference = abs(y.o - y.n)))
+```
+
+We see that $y_{original}=0.09$ and $y_{new}=-0.13$.
